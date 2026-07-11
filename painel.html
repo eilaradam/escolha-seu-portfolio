@@ -43,12 +43,32 @@
   .palette{display:flex;gap:8px;margin:12px 0 20px}
   .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--branco);box-shadow:0 0 0 1px var(--linha)}
 
-  .trocar{background:#fbf3e9;border:1px dashed var(--coral);border-radius:14px;padding:16px 18px;margin-bottom:22px}
-  .trocar h3{font-size:1rem;margin-bottom:8px}
+  .trocar{background:#fbf3e9;border:1px dashed var(--coral);border-radius:14px;padding:18px 18px 16px;margin-bottom:22px}
+  .trocar h3{font-size:1rem;margin-bottom:6px}
   .trocar code{font-family:"SFMono-Regular",Menlo,monospace;font-size:.82em;background:#f0e2d3;color:var(--coral-2);padding:2px 7px;border-radius:6px;font-weight:600}
-  .trocar ul{list-style:none;display:grid;gap:8px;font-size:.92rem;color:var(--tinta-soft)}
-  .trocar li{padding-left:18px;position:relative}
-  .trocar li::before{content:"›";position:absolute;left:2px;color:var(--coral);font-weight:900}
+  .trocar .ajuda{font-size:.9rem;color:var(--tinta-soft);margin-bottom:14px}
+
+  .campos{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  @media(max-width:640px){ .campos{grid-template-columns:1fr} }
+  .campo{display:flex;flex-direction:column;gap:5px}
+  .campo__label{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-soft)}
+  .campo input{font-family:"SFMono-Regular",Menlo,Consolas,monospace;font-size:.82rem;color:var(--tinta);background:var(--branco);border:1.5px solid var(--linha);border-radius:10px;padding:11px 13px;width:100%;transition:.15s}
+  .campo input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px rgba(200,72,31,.13)}
+  .campo input::placeholder{color:#b5aa98}
+  .campo.bom input{border-color:#2f7d4f;background:#f5fbf7}
+  .campo.ruim input{border-color:#c0392b;background:#fdf5f4}
+  .campo__aviso{font-size:.78rem;font-weight:600;min-height:1.1em}
+  .campo.bom .campo__aviso{color:#2f7d4f}
+  .campo.ruim .campo__aviso{color:#c0392b}
+
+  .status{margin-top:12px;font-size:.88rem;font-weight:600;color:var(--tinta-soft);display:flex;align-items:center;gap:8px}
+  .status.pronto{color:#2f7d4f}
+  .status .luz{width:9px;height:9px;border-radius:50%;background:#c9a227;flex:none}
+  .status.pronto .luz{background:#2f7d4f}
+  .privado{margin-top:8px;font-size:.78rem;color:#8a806f}
+
+  mark.ok{background:#d8f0e2;color:#1d5c39;font-weight:700;border-radius:4px;padding:1px 3px}
+  mark.falta{background:#f7dfd8;color:#a63a17;font-weight:700;border-radius:4px;padding:1px 3px}
 
   .prompt-wrap{border:1px solid var(--linha);border-radius:16px;overflow:hidden;background:#faf5ec}
   .prompt-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f0e7d7;border-bottom:1px solid var(--linha)}
@@ -78,7 +98,7 @@
         <h2>Como usar em 4 passos</h2>
         <ol>
           <li><b>Tenha seu portfólio publicado</b> com o Supabase ligado (a parte anterior da aula).</li>
-          <li><b>Troque as 2 chaves do Supabase</b> dentro do prompt (a URL e a chave anon, indicadas abaixo).</li>
+          <li><b>Cole as 2 chaves do Supabase</b> nos campos abaixo (a URL e a chave anon). O prompt se preenche sozinho.</li>
           <li><b>No Claude Code</b>, abra a pasta onde quer o painel, cole o prompt e envie. Ele cria tudo de uma vez.</li>
           <li><b>Crie seu usuário</b> no Supabase (Authentication › Users › Add user) e rode o setup.sql. Pronto, é seu login.</li>
         </ol>
@@ -99,11 +119,24 @@
     <div class="palette"><span class="dot" style="background:#D4572A"></span><span class="dot" style="background:#F5F3EF"></span><span class="dot" style="background:#1A1816"></span><span class="dot" style="background:#2D7A4F"></span></div>
 
     <div class="trocar">
-      <h3>Antes de colar, troque 2 valores:</h3>
-      <ul>
-        <li><code>COLE_AQUI_A_URL_DO_SUPABASE</code> pela URL do projeto (ex: https://xxxx.supabase.co)</li>
-        <li><code>COLE_AQUI_A_CHAVE_ANON</code> pela chave anon (Project Settings › API › anon public)</li>
-      </ul>
+      <h3>Cole aqui os seus 2 dados do Supabase</h3>
+      <p class="ajuda">Os dois ficam no Supabase em <b>Project Settings › API</b>. Cole nos campos e o prompt aqui embaixo se preenche sozinho. Depois é só copiar o prompt inteiro, já com os seus dados.</p>
+
+      <div class="campos">
+        <label class="campo" id="campoUrl">
+          <span class="campo__label">1. URL do projeto</span>
+          <input id="inUrl" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="https://xxxxxxxx.supabase.co">
+          <span class="campo__aviso" id="avisoUrl"></span>
+        </label>
+        <label class="campo" id="campoKey">
+          <span class="campo__label">2. Chave anon (public)</span>
+          <input id="inKey" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="eyJhbGciOiJIUzI1NiIs...">
+          <span class="campo__aviso" id="avisoKey"></span>
+        </label>
+      </div>
+
+      <div class="status" id="status"><span class="luz"></span><span id="statusTxt">Faltam os 2 dados. O prompt abaixo ainda esta com os marcadores.</span></div>
+      <p class="privado">Fica so no seu navegador. Nao enviamos nada para lugar nenhum.</p>
     </div>
 
     <div class="prompt-wrap">
@@ -224,6 +257,97 @@ Quando terminar, me diga em 3 linhas: como testar localmente, como criar meu usu
   </footer>
 
 <script>
+  /* ===== Preenche o prompt com os dados do Supabase da aluna ===== */
+  var PH_URL = 'COLE_AQUI_A_URL_DO_SUPABASE';
+  var PH_KEY = 'COLE_AQUI_A_CHAVE_ANON';
+
+  var pre       = document.querySelector('pre.prompt');
+  var MOLDE     = pre.textContent;              // guarda o prompt original com os marcadores
+  var inUrl     = document.getElementById('inUrl');
+  var inKey     = document.getElementById('inKey');
+  var campoUrl  = document.getElementById('campoUrl');
+  var campoKey  = document.getElementById('campoKey');
+  var avisoUrl  = document.getElementById('avisoUrl');
+  var avisoKey  = document.getElementById('avisoKey');
+  var statusBox = document.getElementById('status');
+  var statusTxt = document.getElementById('statusTxt');
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function troca(txt, alvo, novo){ return txt.split(alvo).join(novo); }
+
+  // A chave anon e um JWT: le o miolo dele pra descobrir se e a anon mesmo ou a secreta.
+  function papelDaChave(k){
+    var p = k.split('.');
+    if(p.length !== 3) return null;
+    try{
+      var corpo = JSON.parse(atob(p[1].replace(/-/g,'+').replace(/_/g,'/')));
+      return corpo.role || null;
+    }catch(e){ return null; }
+  }
+
+  function checaUrl(v){
+    if(!v) return {ok:false, msg:''};
+    if(/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(v)) return {ok:true, msg:'URL certa'};
+    if(/supabase\.co/i.test(v)) return {ok:true, msg:'Parece certa'};
+    return {ok:false, msg:'Isso nao parece a URL do Supabase (tem que terminar em .supabase.co)', erro:true};
+  }
+
+  function checaKey(v){
+    if(!v) return {ok:false, msg:''};
+    var papel = papelDaChave(v);
+    if(papel === 'service_role')
+      return {ok:false, erro:true, msg:'CUIDADO: essa e a chave SECRETA (service_role). Nunca use ela. Pegue a que diz "anon public".'};
+    if(papel === 'anon') return {ok:true, msg:'Chave anon certa'};
+    if(/^sb_publishable_/.test(v)) return {ok:true, msg:'Chave publica certa'};
+    if(/^sb_secret_/.test(v))
+      return {ok:false, erro:true, msg:'CUIDADO: essa e a chave SECRETA. Pegue a chave publica (publishable / anon).'};
+    return {ok:false, erro:true, msg:'Isso nao parece uma chave do Supabase'};
+  }
+
+  function pinta(campo, aviso, r){
+    campo.classList.toggle('bom',  !!r.ok);
+    campo.classList.toggle('ruim', !!r.erro);
+    aviso.textContent = r.msg;
+  }
+
+  function render(){
+    var url = inUrl.value.trim().replace(/\/+$/,'');   // tira barra sobrando no fim
+    var key = inKey.value.trim();
+
+    var rU = checaUrl(url), rK = checaKey(key);
+    pinta(campoUrl, avisoUrl, rU);
+    pinta(campoKey, avisoKey, rK);
+
+    // so entra no prompt o que estiver valido; o resto continua como marcador
+    var usaUrl = rU.ok ? url : '';
+    var usaKey = rK.ok ? key : '';
+
+    var txt = esc(MOLDE);
+    txt = troca(txt, PH_URL, usaUrl ? '<mark class="ok">'+esc(usaUrl)+'</mark>' : '<mark class="falta">'+PH_URL+'</mark>');
+    txt = troca(txt, PH_KEY, usaKey ? '<mark class="ok">'+esc(usaKey)+'</mark>' : '<mark class="falta">'+PH_KEY+'</mark>');
+    pre.innerHTML = txt;
+
+    var completo = usaUrl && usaKey;
+    statusBox.classList.toggle('pronto', !!completo);
+    statusTxt.textContent = completo
+      ? 'Prontinho! O prompt abaixo ja esta com os seus dados. Pode copiar.'
+      : 'Faltam os 2 dados. O prompt abaixo ainda esta com os marcadores.';
+
+    try{
+      localStorage.setItem('painel_supabase_url', inUrl.value);
+      localStorage.setItem('painel_supabase_key', inKey.value);
+    }catch(e){}
+  }
+
+  try{
+    inUrl.value = localStorage.getItem('painel_supabase_url') || '';
+    inKey.value = localStorage.getItem('painel_supabase_key') || '';
+  }catch(e){}
+
+  inUrl.addEventListener('input', render);
+  inKey.addEventListener('input', render);
+  render();
+
   function copyPrompt(btn){
     var pre = btn.closest('.prompt-wrap').querySelector('pre.prompt');
     var txt = pre.innerText;
